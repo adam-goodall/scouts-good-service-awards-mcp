@@ -4,7 +4,7 @@ An MCP (Model Context Protocol) server that assists Scouts volunteers with Good 
 
 ## Installation
 
-### From npm (once published)
+### From npm
 
 Add to your MCP client configuration (e.g. Claude Desktop, Kiro, or any MCP-compatible client):
 
@@ -328,6 +328,28 @@ npm run build
 
 # Run locally
 npm start
+```
+
+## Releasing
+
+This project uses [semantic-release](https://github.com/semantic-release/semantic-release) to automate versioning and publishing. When commits are merged to `main`, the version is bumped automatically based on conventional commit messages:
+
+- `fix:` → patch release (e.g. 1.0.0 → 1.0.1)
+- `feat:` → minor release (e.g. 1.0.0 → 1.1.0)
+- `feat!:` or `BREAKING CHANGE:` → major release (e.g. 1.0.0 → 2.0.0)
+
+Commits that don't match a release type (e.g. `chore:`, `docs:`, `test:`) won't trigger a release.
+
+Publishing uses npm trusted publishing via OIDC — no long-lived tokens are stored in the repository.
+
+## Contributing
+
+Commit messages must follow the [Conventional Commits](https://www.conventionalcommits.org/) specification. This is enforced by commitlint via a git hook.
+
+```
+feat: add new tool for checking deadlines
+fix: correct service year calculation
+docs: update installation instructions
 ```
 
 ## License
