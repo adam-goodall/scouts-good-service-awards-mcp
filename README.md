@@ -4,6 +4,8 @@ An MCP (Model Context Protocol) server that assists Scouts volunteers with Good 
 
 ## Installation
 
+### From npm (once published)
+
 Add to your MCP client configuration (e.g. Claude Desktop, Kiro, or any MCP-compatible client):
 
 ```json
@@ -12,6 +14,30 @@ Add to your MCP client configuration (e.g. Claude Desktop, Kiro, or any MCP-comp
     "scouts-good-service-awards": {
       "command": "npx",
       "args": ["scouts-good-service-awards-mcp"]
+    }
+  }
+}
+```
+
+### From a local clone
+
+Clone the repo, install dependencies, and build:
+
+```bash
+git clone <repo-url>
+cd scouts-good-service-awards-mcp
+npm install
+npm run build
+```
+
+Then point your MCP client at the built entry point:
+
+```json
+{
+  "mcpServers": {
+    "scouts-good-service-awards": {
+      "command": "node",
+      "args": ["/absolute/path/to/scouts-good-service-awards-mcp/dist/index.js"]
     }
   }
 }
