@@ -15,6 +15,7 @@ import {
 import { getNominationGuidance } from "./nomination-guidance.js";
 import { getSampleCitations } from "./sample-citations.js";
 import { getWritingTips } from "./writing-tips.js";
+import { resolveNextStep } from "./nomination-workflow.js";
 
 const AWARD_NAMES = [
   "Chief Scout's Commendation for Good Service",
@@ -196,6 +197,59 @@ server.tool(
     return {
       content: [{ type: "text", text: JSON.stringify(tips) }],
     };
+  },
+);
+
+server.tool(
+  "nomination_workflow",
+  "Guide the user step-by-step through collecting nominee data for a Good Service Award nomination",
+  {
+    state: z.object({
+      membershipNumber: z.string().optional(),
+      nomineeName: z.string().optional(),
+      currentRoles: z.object({
+        hasNonProvisionalRole: z.boolean(),
+        totalRoles: z.number().int().nonnegative(),
+      }).optional(),
+      historicRoles: z.object({
+        earliestStartDate: z.string(),
+        totalServiceYears: z.number().int().nonnegative(),
+      }).optional(),
+      currentAwards: z.object({
+        highestAward: z.enum([
+          "Chief Scout's Commendation for Good Service",
+          "Award for Merit",
+          "Bar to the Award for Merit",
+          "Silver Acorn",
+          "Bar to the Silver Acorn",
+          "Silver Wolf",
+          "none",
+        ]),
+      }).optional(),
+      criminalRecordCheck: z.boolean().optional(),
+      mandatoryLearning: z.boolean().optional(),
+      lineManagers: z.object({
+        confirmed: z.boolean(),
+        input: z.array(z.object({
+          name: z.string(),
+          quote: z.string(),
+          observation: z.string(),
+          example: z.string(),
+        })).optional(),
+      }).optional(),
+    }).default({}),
+  },
+  async (params) => {
+    try {
+      const result = resolveNextStep(params.state);
+      return {
+        content: [{ type: "text", text: JSON.stringify(result) }],
+      };
+    } catch (error) {
+      return {
+        content: [{ type: "text", text: JSON.stringify({ error: true, message: "Unexpected error during workflow step resolution" }) }],
+      };
+    }
   },
 );
 

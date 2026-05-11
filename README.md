@@ -163,6 +163,146 @@ Get citation masterclass guidance and best practices for writing effective Good 
 - `testimonialGuidance` — how to weave quotes into narrative effectively
 - `awardSpecificTips` — tailored advice for the requested award level (if provided)
 
+### nomination_workflow
+
+Guide the user step-by-step through collecting nominee data for a Good Service Award nomination. This tool orchestrates the conversational flow — it determines what data is still needed and tells the MCP client what to prompt the user for next.
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `state` | object | No | Workflow state accumulated so far (defaults to `{}`) |
+
+**State fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `membershipNumber` | string | Nominee's membership number |
+| `nomineeName` | string | Nominee's full name (2–100 characters) |
+| `currentRoles` | object | `{ hasNonProvisionalRole: boolean, totalRoles: number }` |
+| `historicRoles` | object | `{ earliestStartDate: string, totalServiceYears: number }` |
+| `currentAwards` | object | `{ highestAward: string }` — award name or "none" |
+| `criminalRecordCheck` | boolean | Whether nominee has a valid disclosure check |
+| `mandatoryLearning` | boolean | Whether nominee has completed mandatory learning |
+| `lineManagers` | object | `{ confirmed: boolean, input?: LineManagerInput[] }` |
+
+Each `LineManagerInput` has: `{ name: string, quote: string, observation: string, example: string }`
+
+**How it works:**
+
+The tool is stateless — the MCP client accumulates state between invocations. The workflow loop is:
+
+1. Call `nomination_workflow` with current state (start with `{}`)
+2. Display the returned prompt/instructions to the user
+3. Collect the user's response and add it to the state
+4. Call `nomination_workflow` again with the updated state
+5. Repeat until you receive a `summary` or `eligibility_result` response
+
+**Step sequence:**
+
+| Step | Prompts for | Advances when |
+|------|-------------|---------------|
+| `membership_number` | Nominee's membership number | Non-empty string provided |
+| `nominee_name` | Nominee's full name | 2–100 chars, non-whitespace |
+| `current_roles` | Screenshot of current roles page | Role data extracted |
+| `historic_roles` | Screenshot of historic roles page | Service years calculated |
+| `current_awards` | Screenshot of awards page | Highest award identified |
+| `criminal_record_check` | Yes/no confirmation | Boolean provided |
+| `mandatory_learning` | Yes/no confirmation | Boolean provided |
+| `eligibility_result` | — (computed) | Returns eligibility assessment |
+| `line_managers` | Confirm spoken with all LMs | `confirmed: true` |
+| `line_manager_input` | Quotes, observations, examples | Input array provided |
+| `summary` | — (final output) | Lists what's needed for nomination form |
+
+**Example — starting the workflow:**
+
+```
+User: "I'd like to nominate someone for a Good Service Award"
+→ Call: nomination_workflow({ state: {} })
+← Response: { step: "membership_number", prompt: "What is the nominee's membership number?...", field: "membershipNumber", nextStep: "nominee_name" }
+```
+
+**Example — mid-workflow (providing roles data):**
+
+```
+→ Call: nomination_workflow({
+    state: {
+      membershipNumber: "12345678",
+      nomineeName: "Sarah Johnson",
+      currentRoles: { hasNonProvisionalRole: true, totalRoles: 3 }
+    }
+  })
+← Response: { step: "historic_roles", prompt: "Please navigate to the nominee's historic roles page...", ... }
+```
+
+**Example — eligibility result:**
+
+```
+→ Call: nomination_workflow({
+    state: {
+      membershipNumber: "12345678",
+      nomineeName: "Sarah Johnson",
+      currentRoles: { hasNonProvisionalRole: true, totalRoles: 3 },
+      historicRoles: { earliestStartDate: "2012-03-15", totalServiceYears: 13 },
+      currentAwards: { highestAward: "Chief Scout's Commendation for Good Service" },
+      criminalRecordCheck: true,
+      mandatoryLearning: true
+    }
+  })
+← Response: {
+    step: "eligibility_result",
+    assessment: {
+      eligible: true,
+      hasValidAppointment: true,
+      totalServiceYears: 13,
+      highestCurrentAward: "Chief Scout's Commendation for Good Service",
+      nextAwardInProgression: "Award for Merit"
+    }
+  }
+```
+
+**Example — final summary (all data collected):**
+
+```
+→ Call: nomination_workflow({
+    state: {
+      membershipNumber: "12345678",
+      nomineeName: "Sarah Johnson",
+      currentRoles: { hasNonProvisionalRole: true, totalRoles: 3 },
+      historicRoles: { earliestStartDate: "2012-03-15", totalServiceYears: 13 },
+      currentAwards: { highestAward: "Chief Scout's Commendation for Good Service" },
+      criminalRecordCheck: true,
+      mandatoryLearning: true,
+      lineManagers: {
+        confirmed: true,
+        input: [{
+          name: "District Commissioner",
+          quote: "Sarah is one of the most dedicated leaders I have ever worked with",
+          observation: "Consistently goes above and beyond",
+          example: "Organised a district-wide camp for 150 young people"
+        }]
+      }
+    }
+  })
+← Response: {
+    step: "summary",
+    summary: {
+      sections: [
+        { section: "Main Role", status: "populatable", description: "..." },
+        { section: "Additional Service", status: "requires_input", description: "..." },
+        ...
+      ],
+      availableTools: [
+        { name: "get_nomination_guidance", purpose: "..." },
+        { name: "get_sample_citations", purpose: "..." },
+        { name: "get_writing_tips", purpose: "..." }
+      ]
+    }
+  }
+```
+
+**After the workflow completes**, use `get_nomination_guidance`, `get_sample_citations`, and `get_writing_tips` to help write the nomination, then `build_nomination` to format the final form.
+
 ## Award Hierarchy
 
 | Award | Min. Service | Classification | Approved By |

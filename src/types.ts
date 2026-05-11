@@ -137,3 +137,89 @@ export interface WritingTips {
   testimonialGuidance: string[];
   awardSpecificTips?: string[];
 }
+
+// --- Nomination Workflow Types ---
+
+export interface WorkflowState {
+  membershipNumber?: string;
+  nomineeName?: string;
+  currentRoles?: {
+    hasNonProvisionalRole: boolean;
+    totalRoles: number;
+  };
+  historicRoles?: {
+    earliestStartDate: string; // ISO date
+    totalServiceYears: number;
+  };
+  currentAwards?: {
+    highestAward: AwardName | "none";
+  };
+  criminalRecordCheck?: boolean;
+  mandatoryLearning?: boolean;
+  lineManagers?: {
+    confirmed: boolean;
+    input?: LineManagerInput[];
+  };
+}
+
+export interface LineManagerInput {
+  name: string;
+  quote: string;
+  observation: string;
+  example: string;
+}
+
+export type StepId =
+  | "membership_number"
+  | "nominee_name"
+  | "current_roles"
+  | "historic_roles"
+  | "current_awards"
+  | "criminal_record_check"
+  | "mandatory_learning"
+  | "eligibility_result"
+  | "line_managers"
+  | "line_manager_input"
+  | "summary";
+
+export type WorkflowResponse = StepResponse | ResultResponse | ErrorResponse;
+
+export interface StepResponse {
+  step: StepId;
+  prompt: string;
+  instructions?: string;
+  field: string;
+  nextStep: StepId;
+}
+
+export interface EligibilityAssessment {
+  eligible: boolean;
+  hasValidAppointment: boolean;
+  totalServiceYears: number;
+  highestCurrentAward: AwardName | "none";
+  nextAwardInProgression: AwardName | null;
+  unmetCriteria?: UnmetCriterion[];
+}
+
+export interface ResultResponse {
+  step: "eligibility_result" | "summary";
+  assessment?: EligibilityAssessment;
+  summary?: NominationSummary;
+}
+
+export interface NominationSectionStatus {
+  section: string;
+  status: "populatable" | "requires_input";
+  description: string;
+}
+
+export interface NominationSummary {
+  sections: NominationSectionStatus[];
+  availableTools: Array<{ name: string; purpose: string }>;
+}
+
+export interface ErrorResponse {
+  error: true;
+  message: string;
+  invalidFields?: string[];
+}
