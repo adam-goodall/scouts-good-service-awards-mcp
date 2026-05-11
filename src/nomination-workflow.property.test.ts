@@ -478,6 +478,7 @@ describe("Property 8: Unconfirmed line managers block advancement", () => {
       currentAwards: { highestAward: "none" as const },
       criminalRecordCheck: true,
       mandatoryLearning: true,
+      personalStory: { motivation: "Loves Scouting" },
       lineManagers: { confirmed: false },
     }));
 
@@ -516,6 +517,7 @@ describe("Property 9: Confirmed line managers without input prompts for input", 
       currentAwards: { highestAward: "none" as const },
       criminalRecordCheck: true,
       mandatoryLearning: true,
+      personalStory: { motivation: "Loves Scouting" },
       lineManagers: { confirmed: true, input: input as undefined | [] },
     }));
 
@@ -555,6 +557,7 @@ describe("Property 10: Fully-populated state produces summary with correct secti
       currentAwards: { highestAward: "none" as const },
       criminalRecordCheck: true,
       mandatoryLearning: true,
+      personalStory: { motivation: "Loves Scouting" },
       lineManagers: { confirmed: true, input: lineManagerInputs },
     }));
 

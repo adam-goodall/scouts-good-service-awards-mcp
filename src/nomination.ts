@@ -58,9 +58,20 @@ export function formatNominationForm(input: NominationInput): string {
       ? "continued at a similar level"
       : "substantially increased";
 
+  const styleText = input.style === "structured" ? "structured" : "narrative";
+
   const sections = [
     "=== Good Service Award Nomination Form ===",
+    `Style: ${styleText}`,
     "",
+  ];
+
+  if (input.narrativeContext) {
+    sections.push(`Narrative Context: ${input.narrativeContext}`);
+    sections.push("");
+  }
+
+  sections.push(
     `Main Role: ${input.mainRole}`,
     "",
     `Additional Service: ${input.additionalService}`,
@@ -75,11 +86,19 @@ export function formatNominationForm(input: NominationInput): string {
     "",
     `Other Information: ${input.otherInformation}`,
     "",
-    `Citation: ${input.citation}`,
+    `Citation (max 300 chars): ${input.citation}`,
+  );
+
+  if (input.extendedCitation) {
+    sections.push("");
+    sections.push(`Extended Citation: ${input.extendedCitation}`);
+  }
+
+  sections.push(
     "",
     "---",
     "Reminder: Please verify the nominee's eligibility before submitting this nomination.",
-  ];
+  );
 
   return sections.join("\n");
 }

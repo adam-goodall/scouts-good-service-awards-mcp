@@ -226,6 +226,7 @@ describe("resolveNextStep", () => {
     it("unconfirmed line managers returns line_managers step", () => {
       const result = resolveNextStep({
         ...baseEligibleState,
+        personalStory: { motivation: "Loves Scouting" },
         lineManagers: { confirmed: false },
       });
       expect(result).toMatchObject({ step: "line_managers" });
@@ -234,6 +235,7 @@ describe("resolveNextStep", () => {
     it("confirmed line managers without input returns line_manager_input step", () => {
       const result = resolveNextStep({
         ...baseEligibleState,
+        personalStory: { motivation: "Loves Scouting" },
         lineManagers: { confirmed: true },
       });
       expect(result).toMatchObject({ step: "line_manager_input" });
@@ -242,6 +244,7 @@ describe("resolveNextStep", () => {
     it("confirmed line managers with empty input array returns line_manager_input step", () => {
       const result = resolveNextStep({
         ...baseEligibleState,
+        personalStory: { motivation: "Loves Scouting" },
         lineManagers: { confirmed: true, input: [] },
       });
       expect(result).toMatchObject({ step: "line_manager_input" });
@@ -251,6 +254,7 @@ describe("resolveNextStep", () => {
   describe("summary includes all 7 sections and 3 tool references", () => {
     const fullState: WorkflowState = {
       ...baseEligibleState,
+      personalStory: { motivation: "Loves Scouting", characterTraits: "Reliable and dedicated" },
       lineManagers: {
         confirmed: true,
         input: [
