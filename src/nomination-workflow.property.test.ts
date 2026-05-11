@@ -46,8 +46,8 @@ const currentRolesArb = fc.record({
 
 const historicRolesArb = fc.record({
   earliestStartDate: fc
-    .date({ min: new Date("1970-01-01"), max: new Date() })
-    .map((d) => d.toISOString().split("T")[0]),
+    .integer({ min: 0, max: 2051222400000 }) // 1970-01-01 to 2035-01-01 in ms
+    .map((ms) => new Date(ms).toISOString().split("T")[0]),
   totalServiceYears: fc.integer({ min: 0, max: 60 }),
 });
 
