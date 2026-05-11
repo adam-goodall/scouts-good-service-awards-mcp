@@ -45,6 +45,33 @@ Then point your MCP client at the built entry point:
 
 No API keys or network access required — all award data is embedded in the package.
 
+## How to use
+
+### Before you start
+
+Gather the following from the [membership system](https://membership.scouts.org.uk):
+
+- **Screenshots** of the nominee's current roles, historic roles, and awards & wood badges pages
+- **Input from colleagues** — speak to line managers or anyone who knows the nominee well and ask them to share observations, quotes, and specific examples. Bullet points and rough notes are fine; the AI will shape them into polished prose.
+- **Your own notes** about the nominee — what they do, why they're exceptional, what drives them. Again, formatting doesn't matter at this stage.
+
+### Starting a nomination
+
+Once the MCP server is added to your client, say something like:
+
+> "Using the nomination workflow, take me through creating a Good Service Award nomination."
+
+The workflow will guide you step by step — asking for the membership number, prompting you to share screenshots, checking eligibility, and then gathering the narrative material needed to write a compelling citation.
+
+### Refining the output
+
+Once the first draft is generated, chat back and forth to refine it. Ask for changes to tone, emphasis, or structure until you're happy with the result. You can also ask for the nomination to be saved to a file in whatever format you prefer.
+
+### Submitting
+
+When you're satisfied, submit the nomination through the membership system at:
+https://membership.scouts.org.uk/#/awards/nominatesomeone
+
 ## Tools
 
 ### check_eligibility
