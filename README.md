@@ -87,6 +87,9 @@ Create a complete Good Service Award nomination form with all required fields.
 | `communityInvolvement` | string | Yes | Community involvement details |
 | `otherInformation` | string | Yes | Any other relevant information |
 | `citation` | string | Yes | Brief summary (max 300 characters) read aloud at presentation |
+| `extendedCitation` | string | No | Longer citation for the panel (not read aloud, no character limit) |
+| `narrativeContext` | string | No | The nominee's personal story and motivation — used as a narrative thread through all sections |
+| `style` | string | No | `"narrative"` (default) or `"structured"` — controls whether output reads as flowing prose or sectioned content |
 
 **Returns:** A formatted nomination form ready to copy into the Scouts nomination submission system.
 
@@ -159,7 +162,8 @@ Get citation masterclass guidance and best practices for writing effective Good 
 
 **Returns:**
 - `generalTips` — guidance on narrative cohesion, quantification, community involvement, level of service progression, and citation brevity
-- `commonMistakes` — pitfalls to avoid (CV-style writing, empty community involvement, inconsistent quantification)
+- `narrativeStructure` — structural guidance for building a narrative arc across all nomination sections (open with motivation, build through journey, close with argument for the award)
+- `commonMistakes` — pitfalls to avoid (CV-style writing, empty community involvement, inconsistent quantification, treating sections as independent, listing testimonials)
 - `testimonialGuidance` — how to weave quotes into narrative effectively
 - `awardSpecificTips` — tailored advice for the requested award level (if provided)
 
@@ -184,6 +188,7 @@ Guide the user step-by-step through collecting nominee data for a Good Service A
 | `currentAwards` | object | `{ highestAward: string }` — award name or "none" |
 | `criminalRecordCheck` | boolean | Whether nominee has a valid disclosure check |
 | `mandatoryLearning` | boolean | Whether nominee has completed mandatory learning |
+| `personalStory` | object | `{ motivation: string, characterTraits?: string, definingMoments?: string }` |
 | `lineManagers` | object | `{ confirmed: boolean, input?: LineManagerInput[] }` |
 
 Each `LineManagerInput` has: `{ name: string, quote: string, observation: string, example: string }`
@@ -210,6 +215,7 @@ The tool is stateless — the MCP client accumulates state between invocations. 
 | `criminal_record_check` | Yes/no confirmation | Boolean provided |
 | `mandatory_learning` | Yes/no confirmation | Boolean provided |
 | `eligibility_result` | — (computed) | Returns eligibility assessment |
+| `personal_story` | Nominee's motivation, character, defining moments | Story data provided |
 | `line_managers` | Confirm spoken with all LMs | `confirmed: true` |
 | `line_manager_input` | Quotes, observations, examples | Input array provided |
 | `summary` | — (final output) | Lists what's needed for nomination form |
@@ -273,6 +279,11 @@ User: "I'd like to nominate someone for a Good Service Award"
       currentAwards: { highestAward: "Chief Scout's Commendation for Good Service" },
       criminalRecordCheck: true,
       mandatoryLearning: true,
+      personalStory: {
+        motivation: "Sarah joined Scouts as a Brownie and credits the movement with giving her confidence. She volunteers to ensure every young person gets the same opportunities.",
+        characterTraits: "Organised, warm, always the first to offer help",
+        definingMoments: "Kept the group running single-handedly during Covid lockdowns"
+      },
       lineManagers: {
         confirmed: true,
         input: [{
@@ -292,6 +303,11 @@ User: "I'd like to nominate someone for a Good Service Award"
         { section: "Additional Service", status: "requires_input", description: "..." },
         ...
       ],
+      narrativeGuidance: {
+        personalStory: { motivation: "...", characterTraits: "...", definingMoments: "..." },
+        writingApproach: "Use the personal story as a narrative thread that runs through every section...",
+        structuralGuidance: ["Open with the nominee's motivation...", "..."]
+      },
       availableTools: [
         { name: "get_nomination_guidance", purpose: "..." },
         { name: "get_sample_citations", purpose: "..." },
