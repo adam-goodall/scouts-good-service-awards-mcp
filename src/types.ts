@@ -41,6 +41,8 @@ export interface UnmetCriterion {
   reason: string;
 }
 
+export type NominationStyle = "narrative" | "structured";
+
 export interface NominationInput {
   mainRole: string;
   additionalService: string;
@@ -51,6 +53,9 @@ export interface NominationInput {
   communityInvolvement: string;
   otherInformation: string;
   citation: string;
+  extendedCitation?: string;
+  narrativeContext?: string;
+  style?: NominationStyle;
 }
 
 export interface ValidationResult {
@@ -133,6 +138,7 @@ export interface SampleCitationsResponse {
 
 export interface WritingTips {
   generalTips: string[];
+  narrativeStructure: string[];
   commonMistakes: string[];
   testimonialGuidance: string[];
   awardSpecificTips?: string[];
@@ -156,6 +162,11 @@ export interface WorkflowState {
   };
   criminalRecordCheck?: boolean;
   mandatoryLearning?: boolean;
+  personalStory?: {
+    motivation: string;
+    characterTraits?: string;
+    definingMoments?: string;
+  };
   lineManagers?: {
     confirmed: boolean;
     input?: LineManagerInput[];
@@ -178,6 +189,7 @@ export type StepId =
   | "criminal_record_check"
   | "mandatory_learning"
   | "eligibility_result"
+  | "personal_story"
   | "line_managers"
   | "line_manager_input"
   | "summary";
@@ -213,8 +225,21 @@ export interface NominationSectionStatus {
   description: string;
 }
 
+export interface PersonalStory {
+  motivation: string;
+  characterTraits?: string;
+  definingMoments?: string;
+}
+
+export interface NarrativeGuidance {
+  personalStory: PersonalStory | null;
+  writingApproach: string;
+  structuralGuidance: string[];
+}
+
 export interface NominationSummary {
   sections: NominationSectionStatus[];
+  narrativeGuidance?: NarrativeGuidance;
   availableTools: Array<{ name: string; purpose: string }>;
 }
 

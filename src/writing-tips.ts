@@ -6,12 +6,25 @@ export const GENERAL_TIPS: string[] = [
   "Give community involvement real weight — this section demonstrates impact beyond Scouting and is often underdeveloped. Show how the nominee's Scouting skills and values have benefited the wider community.",
   "Frame level of service as a progression — show how the nominee's contribution has grown, deepened, or been sustained over time rather than simply restating what they do now.",
   "Keep the citation brief and impactful — it is read aloud at the presentation ceremony and must be no more than 300 characters. Distil the essence of why this person deserves recognition into a single compelling sentence.",
+  "Use the extended citation field for a richer summary that captures the full arc of the nominee's story — this is not read aloud but supports the panel's decision-making.",
+];
+
+export const NARRATIVE_STRUCTURE_GUIDANCE: string[] = [
+  "Open with the nominee's personal motivation — why they volunteer, what Scouting means to them. This becomes the thread that ties the entire nomination together.",
+  "Each section should build on the last. The reader should feel they are learning more about the same person, not reading disconnected paragraphs about different topics.",
+  "Use the 'Main Role' section to establish both what the nominee does and who they are. Don't just describe the role — show how they bring it to life.",
+  "In 'Key Achievements', tell the story of specific challenges the nominee rose to meet. Frame achievements as narratives with context, action, and outcome — not bullet points.",
+  "In 'Level of Service', show the arc of their journey. Where did they start? How has their contribution grown? What does their trajectory tell us about their character?",
+  "Close with a powerful summary that connects back to the opening motivation. The reader should feel: 'Yes, this person clearly deserves this award.'",
+  "Weave testimonials into the narrative at the point where they are most powerful — a quote should support a specific claim you are making, not stand alone.",
 ];
 
 export const COMMON_MISTAKES: string[] = [
   "Writing like a CV — listing roles, dates, and job titles without conveying the human impact or personal qualities that make the nominee exceptional.",
   "Leaving community involvement empty or vague — this section is required and should contain specific examples of how the nominee has contributed beyond Scouting (e.g., charity work, school governance, community events).",
   "Inconsistent quantification — using precise figures in one section but vague language in another undermines credibility. If you quantify in Key Achievements, maintain that standard throughout.",
+  "Treating each section as independent — the best nominations have a narrative thread that runs through every section, building a coherent portrait of the nominee.",
+  "Listing testimonials at the end rather than weaving them into the narrative — quotes are most powerful when they support a specific point you are making.",
 ];
 
 export const TESTIMONIAL_GUIDANCE: string[] = [
@@ -59,6 +72,7 @@ export const AWARD_SPECIFIC_TIPS: Record<AwardName, string[]> = {
 export function getWritingTips(awardName?: AwardName): WritingTips {
   return {
     generalTips: GENERAL_TIPS,
+    narrativeStructure: NARRATIVE_STRUCTURE_GUIDANCE,
     commonMistakes: COMMON_MISTAKES,
     testimonialGuidance: TESTIMONIAL_GUIDANCE,
     awardSpecificTips: awardName ? AWARD_SPECIFIC_TIPS[awardName] : undefined,

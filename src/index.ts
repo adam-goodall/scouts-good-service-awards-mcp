@@ -75,6 +75,9 @@ server.tool(
     communityInvolvement: z.string().min(1),
     otherInformation: z.string().min(1),
     citation: z.string().min(1).max(300),
+    extendedCitation: z.string().min(1).optional(),
+    narrativeContext: z.string().min(1).optional(),
+    style: z.enum(["narrative", "structured"]).optional(),
   },
   async (params) => {
     const validation = validateNominationForm(params);
@@ -228,6 +231,11 @@ server.tool(
       }).optional(),
       criminalRecordCheck: z.boolean().optional(),
       mandatoryLearning: z.boolean().optional(),
+      personalStory: z.object({
+        motivation: z.string(),
+        characterTraits: z.string().optional(),
+        definingMoments: z.string().optional(),
+      }).optional(),
       lineManagers: z.object({
         confirmed: z.boolean(),
         input: z.array(z.object({

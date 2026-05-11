@@ -72,21 +72,30 @@ export function resolveNextStep(state: WorkflowState): WorkflowResponse {
     }
 
     // Step 8: eligibility_result
-    if (!state.lineManagers) {
+    if (!state.personalStory && !state.lineManagers) {
       return computeEligibilityResult(state);
     }
 
-    // Step 9: line_managers
+    // Step 9: personal_story
+    if (!state.personalStory) {
+      return personalStoryStep();
+    }
+
+    // Step 10: line_managers
+    if (!state.lineManagers) {
+      return lineManagersStep();
+    }
+
     if (!state.lineManagers.confirmed) {
       return lineManagersStep();
     }
 
-    // Step 10: line_manager_input
+    // Step 11: line_manager_input
     if (!state.lineManagers.input || state.lineManagers.input.length === 0) {
       return lineManagerInputStep();
     }
 
-    // Step 11: summary
+    // Step 12: summary
     return buildSummary(state);
   } catch (error) {
     return {
@@ -252,6 +261,16 @@ function computeEligibilityResult(state: WorkflowState): ResultResponse {
   };
 }
 
+function personalStoryStep(): StepResponse {
+  return {
+    step: "personal_story",
+    prompt: "Tell me about this person as a human. What drives them? What is their story?",
+    instructions: "This is the most important step for writing a compelling nomination. The best nominations tell a human story, not a list of roles. Please share:\n\n1. **Motivation**: Why do they volunteer? What got them into Scouting and what keeps them coming back? (e.g., 'They got a lot out of Scouting as a young person and want to give others the same opportunities')\n\n2. **Character traits**: What are they like to work with? What words would colleagues use to describe them? (e.g., 'always the first to volunteer', 'meticulous', 'quietly determined')\n\n3. **Defining moments**: Are there any stories or moments that capture who this person is? Times they went above and beyond, or challenges they overcame while continuing to serve?\n\nThis information will be woven as a narrative thread throughout the entire nomination, giving it coherence and emotional impact.",
+    field: "personalStory",
+    nextStep: "line_managers",
+  };
+}
+
 function lineManagersStep(): StepResponse {
   return {
     step: "line_managers",
@@ -317,6 +336,20 @@ function buildSummary(state: WorkflowState): ResultResponse {
           description: "Write a concise citation of up to 300 characters summarising the nominee's service",
         },
       ],
+      narrativeGuidance: {
+        personalStory: state.personalStory ?? null,
+        writingApproach: "Use the personal story as a narrative thread that runs through every section. Open the Main Role section by establishing who this person is and what drives them. Let that motivation explain why they do what they do. Each section should build on the last, creating a portrait of a person — not a list of roles. Close the Level of Service section with a compelling argument for why this person deserves this specific award. Weave testimonials into the narrative to support specific points rather than listing them separately.",
+        structuralGuidance: [
+          "Open with the nominee's motivation and personal connection to Scouting — this becomes the thread that ties everything together",
+          "In Main Role, establish the scope and scale of their primary contribution, using specific figures and quotes from colleagues",
+          "In Additional Service, show the breadth of their commitment — paint a picture of someone whose contribution touches many areas",
+          "In Key Achievements, tell the story of specific challenges they rose to meet, with concrete outcomes and impact figures",
+          "In Level of Service, show progression over time — how their contribution has grown, deepened, or multiplied in impact",
+          "In Community Involvement, connect their Scouting values to their wider community impact",
+          "In Other Information, bring the testimonials together to paint a final portrait, and close with a powerful summary statement",
+          "The Citation should distil the essence of the entire narrative into a single compelling sentence read aloud at the ceremony",
+        ],
+      },
       availableTools: [
         { name: "get_nomination_guidance", purpose: "Get the nomination form structure, field guidance, and eligibility workflow instructions for writing a Good Service Award nomination" },
         { name: "get_sample_citations", purpose: "Get complete example nominations for a given award level to use as style and tone reference when writing nominations" },

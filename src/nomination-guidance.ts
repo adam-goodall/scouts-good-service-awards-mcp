@@ -11,46 +11,55 @@ export const NOMINATION_SECTIONS: NominationSection[] = [
     title: "Main Role",
     fieldName: "mainRole",
     description:
-      "Describe the nominee's primary Scouting role and responsibilities. Focus on what they do day-to-day and the scope of their contribution.",
+      "Describe the nominee's primary Scouting role and responsibilities. Open by establishing who this person is and what drives them, then describe the scope and scale of their contribution.",
     tips: [
+      "Open with the nominee's personal connection to Scouting — what motivates them. This sets the narrative tone for the entire nomination.",
       "State the role title and how long they have held it",
-      "Describe the scale of their responsibility (e.g. number of young people, groups, or districts)",
+      "Describe the scale of their responsibility (e.g. number of young people, groups, or districts) using specific figures",
       "Explain what makes their contribution in this role exceptional rather than routine",
+      "Weave in a quote from a colleague that captures how they approach the role",
+      "Show the human behind the role — their time commitment, their reliability, their character",
     ],
   },
   {
     title: "Additional Service",
     fieldName: "additionalService",
     description:
-      "Other roles, committees, training teams, or support the nominee provides beyond their main role. This demonstrates breadth of contribution.",
+      "Other roles, committees, training teams, or support the nominee provides beyond their main role. Paint a picture of someone whose contribution touches many areas of Scouting.",
     tips: [
-      "List additional roles with approximate timeframes",
+      "Frame additional service as a narrative of breadth — show how this person's contribution extends across Scouting",
+      "Group related activities thematically (e.g., international, training, events) rather than as a chronological list",
       "Include informal contributions like mentoring, event support, or advisory work",
       "Show how these additional roles complement and extend their main contribution",
+      "Use specific figures: number of events, young people reached, years of involvement",
     ],
   },
   {
     title: "Key Achievements",
     fieldName: "keyAchievements",
     description:
-      "Specific accomplishments that demonstrate the nominee's exceptional service. Use concrete examples with figures where possible.",
+      "Specific accomplishments that demonstrate the nominee's exceptional service. Tell the story of challenges they rose to meet, with concrete outcomes.",
     tips: [
+      "Frame each achievement as a mini-narrative: context (the challenge), action (what they did), outcome (the impact)",
       "Quote specific figures where possible (e.g. 'trained 45 leaders', 'grew the group from 20 to 80 young people')",
       "Focus on outcomes and impact rather than just activities",
       "Include achievements that go beyond what would normally be expected of the role",
       "For nominees with a previous award, focus on achievements since that award was granted",
+      "Weave in testimonials at the point where they evidence a specific achievement",
     ],
   },
   {
     title: "Level of Service",
     fieldName: "levelOfService",
     description:
-      "How the nominee's service has grown, been sustained, or increased over time. This section demonstrates progression and sustained commitment.",
+      "How the nominee's service has grown, been sustained, or increased over time. Show the arc of their journey and build the argument for why they deserve this specific award.",
     tips: [
-      "Describe how their contribution has evolved over the years",
-      "Highlight any increase in responsibility or scope",
+      "Tell the story of their journey — where they started, how they grew, where they are now",
+      "Highlight any increase in responsibility or scope over time",
       "Show sustained commitment through challenges or changing circumstances",
       "For higher awards, demonstrate service that goes substantially beyond what was recognised previously",
+      "Close this section with a compelling argument for why this person deserves this specific award",
+      "Connect back to their personal motivation — show how the scale has changed but the dedication has not",
     ],
   },
   {
@@ -63,30 +72,33 @@ export const NOMINATION_SECTIONS: NominationSection[] = [
       "Include partnerships with schools, councils, charities, or faith groups",
       "Describe community events or projects the nominee has led or supported",
       "Show how their Scouting work creates wider community benefit",
+      "Connect their community involvement to the same values and character traits shown in their Scouting service",
     ],
   },
   {
     title: "Other Information",
     fieldName: "otherInformation",
     description:
-      "Context that doesn't fit elsewhere — personal challenges overcome, testimonials from others, or additional background that strengthens the case.",
+      "Context that doesn't fit elsewhere — bring testimonials together to paint a final portrait of the nominee, mention personal challenges overcome, and close with a powerful summary statement.",
     tips: [
-      "Include testimonials or quotes from colleagues, parents, or young people",
+      "Bring together the strongest testimonials from colleagues, weaving them into a final portrait",
       "Mention personal challenges overcome while maintaining service (e.g. health issues, family circumstances)",
-      "Add any context that helps the reader understand the full picture of the nominee's contribution",
+      "Close with a powerful summary statement that captures the essence of why this person deserves recognition",
+      "The final paragraph should leave the reader in no doubt about the nominee's worthiness",
     ],
   },
   {
     title: "Citation",
     fieldName: "citation",
     description:
-      "A concise summary of why the nominee deserves the award. This is read aloud at the award presentation ceremony.",
+      "A concise summary (max 300 characters) read aloud at the award presentation ceremony. Use the extended citation field for a richer summary for the panel.",
     tips: [
       "Write in the third person (e.g. 'For exceptional service to Scouting in...')",
       "Capture the essence of their contribution in a single compelling statement",
       "Keep it formal but warm — this will be read aloud to an audience",
+      "Use the extendedCitation field for a longer, more evocative summary that captures the full arc of their story — this supports the panel's decision but is not read aloud",
     ],
-    constraints: "Maximum 300 characters. This is read aloud at the award presentation.",
+    constraints: "Maximum 300 characters. This is read aloud at the award presentation. Use the extendedCitation field for a longer version.",
   },
 ];
 
