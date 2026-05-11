@@ -12,6 +12,9 @@ import {
   getProcessingTimeline,
   DRAFT_EXPIRY_WARNING,
 } from "./deadlines.js";
+import { getNominationGuidance } from "./nomination-guidance.js";
+import { getSampleCitations } from "./sample-citations.js";
+import { getWritingTips } from "./writing-tips.js";
 
 const AWARD_NAMES = [
   "Chief Scout's Commendation for Good Service",
@@ -150,6 +153,48 @@ server.tool(
 
     return {
       content: [{ type: "text", text: JSON.stringify(response) }],
+    };
+  },
+);
+
+server.tool(
+  "get_nomination_guidance",
+  "Get the nomination form structure, field guidance, and eligibility workflow instructions for writing a Good Service Award nomination",
+  {
+    awardName: z.enum(AWARD_NAMES).optional(),
+  },
+  async (params) => {
+    const guidance = getNominationGuidance(params.awardName);
+    return {
+      content: [{ type: "text", text: JSON.stringify(guidance) }],
+    };
+  },
+);
+
+server.tool(
+  "get_sample_citations",
+  "Get complete example nominations for a given award level to use as style and tone reference when writing nominations",
+  {
+    awardName: z.enum(AWARD_NAMES).optional(),
+  },
+  async (params) => {
+    const samples = getSampleCitations(params.awardName);
+    return {
+      content: [{ type: "text", text: JSON.stringify(samples) }],
+    };
+  },
+);
+
+server.tool(
+  "get_writing_tips",
+  "Get citation masterclass guidance and best practices for writing effective Good Service Award nominations",
+  {
+    awardName: z.enum(AWARD_NAMES).optional(),
+  },
+  async (params) => {
+    const tips = getWritingTips(params.awardName);
+    return {
+      content: [{ type: "text", text: JSON.stringify(tips) }],
     };
   },
 );

@@ -1,6 +1,6 @@
 # Scouts Good Service Awards MCP Server
 
-An MCP (Model Context Protocol) server that assists Scouts volunteers with Good Service Award nominations. It checks eligibility, helps build nomination forms, provides award hierarchy information, and tracks submission deadlines.
+An MCP (Model Context Protocol) server that assists Scouts volunteers with Good Service Award nominations. It checks eligibility, helps build nomination forms, provides award hierarchy information, tracks submission deadlines, and supplies reference material for writing high-quality nominations.
 
 ## Installation
 
@@ -89,6 +89,53 @@ Get quarterly submission deadlines and post-deadline processing timelines.
 | `currentDate` | string (ISO date) | No | Date to calculate from (defaults to today) |
 
 **Returns:** All four quarterly deadlines (31 March, 30 June, 30 September, 31 December), the next upcoming deadline, expected processing timeline, and draft expiry warning.
+
+### get_nomination_guidance
+
+Get the nomination form structure, field guidance, and eligibility workflow instructions for writing a Good Service Award nomination.
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `awardName` | string | No | Specific award to tailor guidance for |
+
+**Returns:**
+- `sections` — the 7 nomination form sections with titles, descriptions, tips, and constraints (e.g. citation max 300 characters)
+- `eligibilityWorkflow` — step-by-step instructions for checking eligibility from member record data before writing
+- `awardSpecificGuidance` — tailored guidance for the requested award level (evidence required, typical profile, tips)
+
+### get_sample_citations
+
+Get complete example nominations for a given award level to use as style and tone reference when writing nominations.
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `awardName` | string | No | Award level to get examples for |
+
+**Behaviour:**
+- If `awardName` is provided: returns example nominations for that specific award level
+- If `awardName` is omitted: returns all available examples across all award levels
+
+Examples are sourced from the [Scouts citation masterclass](https://www.scouts.org.uk/volunteers/learning-development-and-awards/awards-and-recognition/citation-masterclass/good-service-award-nomination-form-examples/) and include complete 7-section nominations demonstrating the expected depth and tone for each award level.
+
+### get_writing_tips
+
+Get citation masterclass guidance and best practices for writing effective Good Service Award nominations.
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `awardName` | string | No | Award level to get specific tips for |
+
+**Returns:**
+- `generalTips` — guidance on narrative cohesion, quantification, community involvement, level of service progression, and citation brevity
+- `commonMistakes` — pitfalls to avoid (CV-style writing, empty community involvement, inconsistent quantification)
+- `testimonialGuidance` — how to weave quotes into narrative effectively
+- `awardSpecificTips` — tailored advice for the requested award level (if provided)
 
 ## Award Hierarchy
 

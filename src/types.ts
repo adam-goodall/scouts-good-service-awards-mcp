@@ -74,3 +74,66 @@ export interface ProcessingTimeline {
   congratulatoryLetters: string;
   compassUpload: string;
 }
+
+// --- Nomination Guidance Types ---
+
+export interface NominationSection {
+  title: string;
+  fieldName: keyof NominationInput;
+  description: string;
+  tips: string[];
+  constraints?: string;
+}
+
+export interface EligibilityWorkflow {
+  description: string;
+  steps: EligibilityWorkflowStep[];
+}
+
+export interface EligibilityWorkflowStep {
+  step: number;
+  instruction: string;
+  details?: string;
+}
+
+export interface AwardSpecificGuidance {
+  awardName: AwardName;
+  evidenceRequired: string;
+  typicalProfile: string;
+  tips: string[];
+}
+
+export interface NominationGuidance {
+  sections: NominationSection[];
+  eligibilityWorkflow: EligibilityWorkflow;
+  awardSpecificGuidance?: AwardSpecificGuidance;
+}
+
+// --- Sample Citations Types ---
+
+export interface SampleNomination {
+  nomineeName: string;
+  awardLevel: AwardName;
+  mainRole: string;
+  additionalService: string;
+  keyAchievements: string;
+  levelOfService: string;
+  communityInvolvement: string;
+  otherInformation: string;
+  citation: string;
+}
+
+export interface SampleCitationsResponse {
+  samples: SampleNomination[];
+  awardLevel: AwardName | "all";
+  note?: string;
+}
+
+// --- Writing Tips Types ---
+
+export interface WritingTips {
+  generalTips: string[];
+  commonMistakes: string[];
+  testimonialGuidance: string[];
+  awardSpecificTips?: string[];
+}

@@ -48,7 +48,9 @@ describe("Property 9: Next deadline correctness", () => {
   it("returned deadline is a valid quarterly date, on or after the input, with no closer deadline between", () => {
     fc.assert(
       fc.property(
-        fc.date({ min: new Date(2000, 0, 1), max: new Date(2100, 11, 31) }),
+        fc.date({ min: new Date(2000, 0, 1), max: new Date(2100, 11, 31) }).filter(
+          (d) => !isNaN(d.getTime()),
+        ),
         (inputDate) => {
           const result = getNextDeadline(inputDate);
 
