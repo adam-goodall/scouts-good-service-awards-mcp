@@ -383,6 +383,8 @@ This project uses [semantic-release](https://github.com/semantic-release/semanti
 
 Commits that don't match a release type (e.g. `chore:`, `docs:`, `test:`) won't trigger a release.
 
+**Dependency updates use `fix:`, not `chore:`.** Since this package is consumed via npm, dependency updates (including dev dependencies) must trigger a patch release so consumers pick up the changes. See `.kiro/steering/dependency-updates.md` for details.
+
 Publishing uses npm trusted publishing via OIDC — no long-lived tokens are stored in the repository.
 
 ## Contributing
