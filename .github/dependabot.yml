@@ -9,3 +9,15 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    # Group related bumps into as few PRs as possible so they can be
+    # consolidated and released together rather than one PR per package.
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
