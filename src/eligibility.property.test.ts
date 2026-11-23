@@ -85,6 +85,7 @@ describe("Property 1: Eligibility result consistency", () => {
  * unmetCriteria includes insufficient service years.
  */
 
+// Bars are excluded: they have no total-years minimum, only the five-year gap.
 const AWARD_MINIMUMS: Array<{
   name: AwardName;
   minimumServiceYears: number;
@@ -101,24 +102,14 @@ const AWARD_MINIMUMS: Array<{
     prerequisite: "none",
   },
   {
-    name: "Bar to the Award for Merit",
-    minimumServiceYears: 15,
-    prerequisite: "Award for Merit",
-  },
-  {
     name: "Silver Acorn",
     minimumServiceYears: 20,
-    prerequisite: "Bar to the Award for Merit",
-  },
-  {
-    name: "Bar to the Silver Acorn",
-    minimumServiceYears: 25,
-    prerequisite: "Silver Acorn",
+    prerequisite: "none",
   },
   {
     name: "Silver Wolf",
     minimumServiceYears: 30,
-    prerequisite: "Silver Acorn",
+    prerequisite: "none",
   },
 ];
 

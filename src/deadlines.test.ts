@@ -123,3 +123,15 @@ describe("DRAFT_EXPIRY_WARNING", () => {
     expect(DRAFT_EXPIRY_WARNING).toContain("automatically rejected");
   });
 });
+
+describe("getAllDeadlines with a reference date", () => {
+  it("returns the deadlines for the reference date's year", () => {
+    const result = getAllDeadlines(new Date(2030, 5, 15));
+    expect(result.map((d) => d.date)).toEqual([
+      "2030-03-31",
+      "2030-06-30",
+      "2030-09-30",
+      "2030-12-31",
+    ]);
+  });
+});

@@ -88,6 +88,32 @@ describe("resolveNextStep", () => {
       expect(result).toMatchObject({ step: "mandatory_learning" });
     });
 
+    it("criminalRecordCheckRequired false skips the disclosure step", () => {
+      const result = resolveNextStep({
+        membershipNumber: "12345",
+        nomineeName: "John Smith",
+        currentRoles: { hasNonProvisionalRole: true, totalRoles: 1 },
+        historicRoles: { earliestStartDate: "2015-01-01", totalServiceYears: 8 },
+        currentAwards: { highestAward: "none" },
+        criminalRecordCheckRequired: false,
+      });
+      expect(result).toMatchObject({ step: "mandatory_learning" });
+    });
+    it("eligibility ignores the disclosure check when the role does not need one", () => {
+      const result = resolveNextStep({
+        membershipNumber: "12345",
+        nomineeName: "John Smith",
+        currentRoles: { hasNonProvisionalRole: true, totalRoles: 1 },
+        historicRoles: { earliestStartDate: "2015-01-01", totalServiceYears: 8 },
+        currentAwards: { highestAward: "none" },
+        criminalRecordCheckRequired: false,
+        mandatoryLearning: true,
+      });
+      expect(result).toMatchObject({
+        step: "eligibility_result",
+        assessment: { eligible: true },
+      });
+    });
     it("+ mandatoryLearning → eligibility_result", () => {
       const result = resolveNextStep(baseEligibleState);
       expect(result).toMatchObject({ step: "eligibility_result" });
