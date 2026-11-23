@@ -8,10 +8,9 @@ import type { AwardName } from "./types.js";
  * **Validates: Requirements 1.5, 1.7**
  *
  * Property 4: Award progression validation
- * For any (previousAward, targetAward) combination where targetAward is not
- * the valid next step in the hierarchy from previousAward (including the case
- * where previousAward equals targetAward), isValidProgression returns false.
- * For valid progressions, it returns true.
+ * An award can follow any lower award (or none), except that each Bar needs
+ * the award it is a bar to as the most recent award. The same award twice,
+ * or going backwards, is never valid.
  */
 
 const ALL_AWARDS: AwardName[] = [
@@ -27,9 +26,16 @@ const ALL_AWARDS: AwardName[] = [
 const VALID_PROGRESSIONS: Array<[AwardName | null, AwardName]> = [
   [null, "Chief Scout's Commendation for Good Service"],
   [null, "Award for Merit"],
+  [null, "Silver Acorn"],
+  [null, "Silver Wolf"],
   ["Chief Scout's Commendation for Good Service", "Award for Merit"],
+  ["Chief Scout's Commendation for Good Service", "Silver Acorn"],
+  ["Chief Scout's Commendation for Good Service", "Silver Wolf"],
   ["Award for Merit", "Bar to the Award for Merit"],
+  ["Award for Merit", "Silver Acorn"],
+  ["Award for Merit", "Silver Wolf"],
   ["Bar to the Award for Merit", "Silver Acorn"],
+  ["Bar to the Award for Merit", "Silver Wolf"],
   ["Silver Acorn", "Bar to the Silver Acorn"],
   ["Silver Acorn", "Silver Wolf"],
   ["Bar to the Silver Acorn", "Silver Wolf"],

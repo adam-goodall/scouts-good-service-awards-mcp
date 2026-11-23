@@ -62,7 +62,10 @@ export function resolveNextStep(state: WorkflowState): WorkflowResponse {
     }
 
     // Step 6: criminal_record_check
-    if (state.criminalRecordCheck === undefined) {
+    if (
+      state.criminalRecordCheck === undefined &&
+      state.criminalRecordCheckRequired !== false
+    ) {
       return criminalRecordCheckStep();
     }
 
@@ -210,7 +213,7 @@ function criminalRecordCheckStep(): StepResponse {
   return {
     step: "criminal_record_check",
     prompt: "Does the nominee have a current criminal records disclosure check?",
-    instructions: "A valid disclosure check is required for eligibility. The nominee must hold a current check at the time of nomination. Please confirm yes or no.",
+    instructions: "A valid disclosure check is only required if the nominee's active role requires one. If it does, confirm yes or no (field criminalRecordCheck). If their role does not require a disclosure check, set criminalRecordCheckRequired to false instead.",
     field: "criminalRecordCheck",
     nextStep: "mandatory_learning",
   };
@@ -234,8 +237,10 @@ function deriveEligibilityInput(state: WorkflowState): EligibilityInput {
     isMember: true, // Assumed — they're in the membership system
     isAppointed: state.currentRoles!.hasNonProvisionalRole,
     mandatoryLearningComplete: state.mandatoryLearning!,
-    criminalRecordCheckValid: state.criminalRecordCheck!,
+    criminalRecordCheckValid: state.criminalRecordCheck ?? false,
+    disclosureRequired: state.criminalRecordCheckRequired ?? true,
     previousAward: state.currentAwards!.highestAward,
+    dateOfLastAward: state.currentAwards!.dateOfLastAward,
   };
 }
 
@@ -253,6 +258,9 @@ function computeEligibilityResult(state: WorkflowState): ResultResponse {
 
   if (result.unmetCriteria.length > 0) {
     assessment.unmetCriteria = result.unmetCriteria;
+  }
+  if (result.warnings) {
+    assessment.warnings = result.warnings;
   }
 
   return {

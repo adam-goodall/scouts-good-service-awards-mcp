@@ -22,7 +22,7 @@ describe("AWARD_HIERARCHY", () => {
 
   it("has correct minimum service years for each award", () => {
     const years = AWARD_HIERARCHY.map((a) => a.minimumServiceYears);
-    expect(years).toEqual([5, 10, 15, 20, 25, 30]);
+    expect(years).toEqual([5, 10, null, 20, null, 30]);
   });
 
   it("classifies lower and higher awards correctly", () => {
@@ -41,15 +41,27 @@ describe("AWARD_HIERARCHY", () => {
     expect(AWARD_HIERARCHY.every((a) => a.fiveYearGapRequired)).toBe(true);
   });
 
-  it("lower awards are approved locally", () => {
-    const lowerAwards = AWARD_HIERARCHY.filter(
-      (a) => a.classification === "lower",
+  it("approval levels follow the quick-reference guide", () => {
+    const authority = Object.fromEntries(
+      AWARD_HIERARCHY.map((a) => [a.name, a.approvalAuthority]),
     );
-    expect(
-      lowerAwards.every(
-        (a) => a.approvalAuthority === "Local (District/County/Area)",
-      ),
-    ).toBe(true);
+    expect(authority).toEqual({
+      "Chief Scout's Commendation for Good Service":
+        "District Commissioner and above",
+      "Award for Merit": "District Commissioner and above",
+      "Bar to the Award for Merit": "County Commissioner and above",
+      "Silver Acorn": "County Commissioner and above",
+      "Bar to the Silver Acorn": "National Awards Advisory Group",
+      "Silver Wolf": "National Awards Advisory Group",
+    });
+  });
+
+  it("only the two Bars have a prerequisite award", () => {
+    const withPrerequisite = AWARD_HIERARCHY.filter((a) => a.prerequisite);
+    expect(withPrerequisite.map((a) => a.name)).toEqual([
+      "Bar to the Award for Merit",
+      "Bar to the Silver Acorn",
+    ]);
   });
 
   it("higher awards require National Awards Advisory Group", () => {
@@ -74,7 +86,7 @@ describe("getAwardByName", () => {
     const award = getAwardByName("Silver Acorn");
     expect(award.minimumServiceYears).toBe(20);
     expect(award.classification).toBe("lower");
-    expect(award.prerequisite).toBe("Bar to the Award for Merit");
+    expect(award.prerequisite).toBeNull();
   });
 
   it("throws for an unknown award name", () => {
@@ -173,11 +185,39 @@ describe("isValidProgression", () => {
     ).toBe(false);
   });
 
-  it("rejects skipping multiple levels", () => {
-    expect(isValidProgression("Award for Merit", "Silver Acorn")).toBe(false);
+  it("allows Award for Merit → Silver Acorn (no previous award needed)", () => {
+    expect(isValidProgression("Award for Merit", "Silver Acorn")).toBe(true);
   });
 
-  it("rejects null → Silver Wolf (skipping all)", () => {
-    expect(isValidProgression(null, "Silver Wolf")).toBe(false);
+  it("allows null → Silver Acorn", () => {
+    expect(isValidProgression(null, "Silver Acorn")).toBe(true);
+  });
+
+  it("allows null → Silver Wolf (no previous award needed)", () => {
+    expect(isValidProgression(null, "Silver Wolf")).toBe(true);
+  });
+
+  it("allows Award for Merit → Silver Wolf", () => {
+    expect(isValidProgression("Award for Merit", "Silver Wolf")).toBe(true);
+  });
+
+  it("rejects Bar to the Silver Acorn unless Silver Acorn is the latest award", () => {
+    expect(
+      isValidProgression("Bar to the Award for Merit", "Bar to the Silver Acorn"),
+    ).toBe(false);
+    expect(isValidProgression(null, "Bar to the Silver Acorn")).toBe(false);
+  });
+
+  it("rejects Bar to the Award for Merit unless Award for Merit is the latest award", () => {
+    expect(
+      isValidProgression(
+        "Chief Scout's Commendation for Good Service",
+        "Bar to the Award for Merit",
+      ),
+    ).toBe(false);
+  });
+
+  it("rejects any award after Silver Wolf", () => {
+    expect(isValidProgression("Silver Wolf", "Silver Acorn")).toBe(false);
   });
 });

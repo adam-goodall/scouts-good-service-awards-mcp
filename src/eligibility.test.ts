@@ -54,6 +54,24 @@ describe("checkGeneralCriteria", () => {
     expect(result[0].criterion).toBe("Criminal Record Check");
   });
 
+  it("does not require a disclosure check when the role does not need one", () => {
+    const result = checkGeneralCriteria({
+      ...fullyEligibleInput,
+      criminalRecordCheckValid: false,
+      disclosureRequired: false,
+    });
+    expect(result).toEqual([]);
+  });
+
+  it("still requires a disclosure check when disclosureRequired is true", () => {
+    const result = checkGeneralCriteria({
+      ...fullyEligibleInput,
+      criminalRecordCheckValid: false,
+      disclosureRequired: true,
+    });
+    expect(result.map((c) => c.criterion)).toEqual(["Criminal Record Check"]);
+  });
+
   it("returns multiple unmet criteria when several are not met", () => {
     const result = checkGeneralCriteria({
       ...fullyEligibleInput,
@@ -88,7 +106,7 @@ describe("checkAwardSpecificCriteria", () => {
     const result = checkAwardSpecificCriteria({
       ...fullyEligibleInput,
       previousAward: "none",
-      targetAward: "Silver Acorn",
+      targetAward: "Bar to the Silver Acorn",
     });
     expect(result.some((c) => c.criterion === "Award Progression")).toBe(true);
   });
@@ -119,6 +137,89 @@ describe("checkAwardSpecificCriteria", () => {
       dateOfLastAward: "2015-01-01",
     });
     expect(result.some((c) => c.criterion === "Five-Year Gap")).toBe(false);
+  });
+});
+
+describe("award rules from the quick-reference guide", () => {
+  const base: EligibilityInput = {
+    ...fullyEligibleInput,
+    previousAward: "none",
+    dateOfLastAward: undefined,
+  };
+
+  it("allows Silver Acorn with 20 years and no previous award", () => {
+    const result = checkEligibility({
+      ...base,
+      serviceYears: 20,
+      targetAward: "Silver Acorn",
+    });
+    expect(result.eligible).toBe(true);
+  });
+
+  it("allows Silver Wolf with no previous award", () => {
+    const result = checkEligibility({
+      ...base,
+      serviceYears: 30,
+      targetAward: "Silver Wolf",
+    });
+    expect(result.eligible).toBe(true);
+  });
+
+  it("does not apply a total-years minimum to Bar to the Award for Merit", () => {
+    const result = checkEligibility(
+      {
+        ...base,
+        serviceYears: 8,
+        previousAward: "Award for Merit",
+        dateOfLastAward: "2020-01-01",
+        targetAward: "Bar to the Award for Merit",
+      },
+      new Date("2025-06-01"),
+    );
+    expect(result.eligible).toBe(true);
+  });
+
+  it("requires 5 years after the Award for Merit for the Bar", () => {
+    const result = checkEligibility(
+      {
+        ...base,
+        serviceYears: 12,
+        previousAward: "Award for Merit",
+        dateOfLastAward: "2021-01-01",
+        targetAward: "Bar to the Award for Merit",
+      },
+      new Date("2025-06-01"),
+    );
+    expect(result.unmetCriteria.map((c) => c.criterion)).toEqual([
+      "Five-Year Gap",
+    ]);
+  });
+
+  it("uses the supplied date for the five-year gap", () => {
+    const input = {
+      ...fullyEligibleInput,
+      dateOfLastAward: "2020-06-01",
+    };
+    expect(
+      checkEligibility(input, new Date("2025-05-31")).eligible,
+    ).toBe(false);
+    expect(
+      checkEligibility(input, new Date("2025-06-01")).eligible,
+    ).toBe(true);
+  });
+
+  it("warns when a previous award is held but its date is missing", () => {
+    const result = checkEligibility({
+      ...fullyEligibleInput,
+      dateOfLastAward: undefined,
+    });
+    expect(result.warnings).toHaveLength(1);
+    expect(result.warnings![0]).toContain("dateOfLastAward");
+  });
+
+  it("does not warn when there is no previous award", () => {
+    const result = checkEligibility({ ...base, targetAward: "Award for Merit" });
+    expect(result.warnings).toBeUndefined();
   });
 });
 

@@ -10,7 +10,8 @@ export type AwardClassification = "lower" | "higher";
 
 export interface Award {
   name: AwardName;
-  minimumServiceYears: number;
+  /** Total years of service required, or null when the award is only timed from the previous award. */
+  minimumServiceYears: number | null;
   classification: AwardClassification;
   prerequisite: AwardName | null;
   approvalAuthority: string;
@@ -24,6 +25,8 @@ export interface EligibilityInput {
   isAppointed: boolean;
   mandatoryLearningComplete: boolean;
   criminalRecordCheckValid: boolean;
+  /** Whether the nominee's active role requires a disclosure check. Defaults to true. */
+  disclosureRequired?: boolean;
   previousAward: AwardName | "none";
   dateOfLastAward?: string; // ISO date
   targetAward?: AwardName;
@@ -34,6 +37,8 @@ export interface EligibilityResult {
   targetAward?: AwardName;
   eligibleAwards?: AwardName[];
   unmetCriteria: UnmetCriterion[];
+  /** Things the tool could not verify from the input provided. */
+  warnings?: string[];
 }
 
 export interface UnmetCriterion {
@@ -159,8 +164,11 @@ export interface WorkflowState {
   };
   currentAwards?: {
     highestAward: AwardName | "none";
+    dateOfLastAward?: string; // ISO date
   };
   criminalRecordCheck?: boolean;
+  /** Set to false when the nominee's active role does not require a disclosure check. */
+  criminalRecordCheckRequired?: boolean;
   mandatoryLearning?: boolean;
   personalStory?: {
     motivation: string;
@@ -211,6 +219,7 @@ export interface EligibilityAssessment {
   highestCurrentAward: AwardName | "none";
   nextAwardInProgression: AwardName | null;
   unmetCriteria?: UnmetCriterion[];
+  warnings?: string[];
 }
 
 export interface ResultResponse {

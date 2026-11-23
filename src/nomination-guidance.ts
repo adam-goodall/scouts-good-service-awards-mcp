@@ -111,14 +111,14 @@ export const ELIGIBILITY_WORKFLOW: EligibilityWorkflow = {
       instruction:
         "Extract eligibility-relevant data from user-provided member record screenshots.",
       details:
-        "Look for: service years, previous awards held, date of last award, membership status (active member), appointment status (currently appointed to a role), mandatory learning completion, and criminal record check status (valid/expired).",
+        "Look for: service years, previous awards held, date of last award, membership status (active member), appointment status (currently appointed to a role), mandatory learning completion, and, if the active role requires a disclosure check, its status (valid/expired).",
     },
     {
       step: 2,
       instruction:
         "Call the check_eligibility tool with the extracted data to confirm the nominee qualifies for the target award.",
       details:
-        "Pass serviceYears, isMember, isAppointed, mandatoryLearningComplete, criminalRecordCheckValid, previousAward, dateOfLastAward, and targetAward to the check_eligibility tool.",
+        "Pass serviceYears, isMember, isAppointed, mandatoryLearningComplete, criminalRecordCheckValid (plus disclosureRequired: false if the role does not need a disclosure check), previousAward, dateOfLastAward, and targetAward to the check_eligibility tool.",
     },
     {
       step: 3,

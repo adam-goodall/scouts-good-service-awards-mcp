@@ -5,7 +5,12 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { checkEligibility } from "./eligibility.js";
 import { validateNominationForm, formatNominationForm } from "./nomination.js";
-import { AWARD_HIERARCHY, getAwardByName } from "./awards.js";
+import {
+  AWARD_HIERARCHY,
+  AWARD_DATA_LAST_REVIEWED,
+  AWARD_DATA_SOURCES,
+  getAwardByName,
+} from "./awards.js";
 import {
   getNextDeadline,
   getAllDeadlines,
@@ -40,6 +45,7 @@ server.tool(
     isAppointed: z.boolean(),
     mandatoryLearningComplete: z.boolean(),
     criminalRecordCheckValid: z.boolean(),
+    disclosureRequired: z.boolean().optional(),
     previousAward: z.enum([...AWARD_NAMES, "none"]).optional(),
     dateOfLastAward: z.string().date().optional(),
     targetAward: z.enum(AWARD_NAMES).optional(),
@@ -51,6 +57,7 @@ server.tool(
       isAppointed: params.isAppointed,
       mandatoryLearningComplete: params.mandatoryLearningComplete,
       criminalRecordCheckValid: params.criminalRecordCheckValid,
+      disclosureRequired: params.disclosureRequired,
       previousAward: params.previousAward ?? "none",
       dateOfLastAward: params.dateOfLastAward,
       targetAward: params.targetAward,
@@ -113,7 +120,9 @@ server.tool(
     if (!params.award) {
       const response = {
         hierarchy: AWARD_HIERARCHY,
-        note: "Lower awards (Chief Scout's Commendation, Award for Merit, Bar to Award for Merit, Silver Acorn) are approved locally by District, County, or Area Lead Volunteers. Higher awards (Bar to Silver Acorn, Silver Wolf) require local support followed by a decision from the National Awards Advisory Group.",
+        dataLastReviewed: AWARD_DATA_LAST_REVIEWED,
+        sources: AWARD_DATA_SOURCES,
+        note: "Lower awards (Chief Scout's Commendation, Award for Merit, Bar to Award for Merit, Silver Acorn) are approved locally; see each award's approvalAuthority. Higher awards (Bar to Silver Acorn, Silver Wolf) require local support followed by a decision from the National Awards Advisory Group.",
       };
       return {
         content: [{ type: "text", text: JSON.stringify(response) }],
@@ -123,9 +132,11 @@ server.tool(
     const award = getAwardByName(params.award);
     const response = {
       ...award,
+      dataLastReviewed: AWARD_DATA_LAST_REVIEWED,
+      sources: AWARD_DATA_SOURCES,
       note:
         award.classification === "lower"
-          ? "Lower awards are approved locally by District, County, or Area Lead Volunteers."
+          ? "Lower awards are approved locally; see approvalAuthority for the level required."
           : "Higher awards require local support followed by a decision from the National Awards Advisory Group.",
     };
     return {
@@ -143,7 +154,7 @@ server.tool(
   async (params) => {
     const date = params.currentDate ? new Date(params.currentDate) : new Date();
     const nextDeadline = getNextDeadline(date);
-    const allDeadlines = getAllDeadlines();
+    const allDeadlines = getAllDeadlines(date);
     const processingTimeline = getProcessingTimeline(
       new Date(nextDeadline.date),
     );
@@ -228,8 +239,10 @@ server.tool(
           "Silver Wolf",
           "none",
         ]),
+        dateOfLastAward: z.string().date().optional(),
       }).optional(),
       criminalRecordCheck: z.boolean().optional(),
+      criminalRecordCheckRequired: z.boolean().optional(),
       mandatoryLearning: z.boolean().optional(),
       personalStory: z.object({
         motivation: z.string(),

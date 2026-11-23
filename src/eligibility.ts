@@ -11,7 +11,7 @@ import { AWARD_HIERARCHY, getAwardByName, isValidProgression } from "./awards.js
  * - Must be a member
  * - Must be appointed
  * - Must have completed mandatory learning
- * - Must have a valid criminal record check
+ * - Must have a valid disclosure check, but only if the active role requires one
  */
 export function checkGeneralCriteria(input: EligibilityInput): UnmetCriterion[] {
   const unmet: UnmetCriterion[] = [];
@@ -37,10 +37,12 @@ export function checkGeneralCriteria(input: EligibilityInput): UnmetCriterion[] 
     });
   }
 
-  if (!input.criminalRecordCheckValid) {
+  const disclosureRequired = input.disclosureRequired ?? true;
+  if (disclosureRequired && !input.criminalRecordCheckValid) {
     unmet.push({
       criterion: "Criminal Record Check",
-      reason: "Nominee must have a valid criminal record check",
+      reason:
+        "Nominee must have a valid disclosure check (required because their active role needs one)",
     });
   }
 
@@ -54,7 +56,10 @@ export function checkGeneralCriteria(input: EligibilityInput): UnmetCriterion[] 
  * - 5-year gap since last award (if dateOfLastAward provided)
  * - Cannot already hold the target award
  */
-export function checkAwardSpecificCriteria(input: EligibilityInput): UnmetCriterion[] {
+export function checkAwardSpecificCriteria(
+  input: EligibilityInput,
+  now: Date = new Date(),
+): UnmetCriterion[] {
   const unmet: UnmetCriterion[] = [];
 
   if (!input.targetAward) {
@@ -64,7 +69,10 @@ export function checkAwardSpecificCriteria(input: EligibilityInput): UnmetCriter
   const award = getAwardByName(input.targetAward);
 
   // Service years check
-  if (input.serviceYears < award.minimumServiceYears) {
+  if (
+    award.minimumServiceYears !== null &&
+    input.serviceYears < award.minimumServiceYears
+  ) {
     unmet.push({
       criterion: "Service Years",
       reason: `Nominee has ${input.serviceYears} years of service but ${award.name} requires a minimum of ${award.minimumServiceYears} years`,
@@ -90,7 +98,6 @@ export function checkAwardSpecificCriteria(input: EligibilityInput): UnmetCriter
   // 5-year gap check
   if (input.dateOfLastAward) {
     const lastAwardDate = new Date(input.dateOfLastAward);
-    const now = new Date();
     const fiveYearsLater = new Date(lastAwardDate);
     fiveYearsLater.setFullYear(fiveYearsLater.getFullYear() + 5);
 
@@ -110,7 +117,10 @@ export function checkAwardSpecificCriteria(input: EligibilityInput): UnmetCriter
  * If targetAward is specified, checks against that award.
  * If targetAward is not specified, determines all eligible awards.
  */
-export function checkEligibility(input: EligibilityInput): EligibilityResult {
+export function checkEligibility(
+  input: EligibilityInput,
+  now: Date = new Date(),
+): EligibilityResult {
   // Validate serviceYears is a positive integer (Req 6.1)
   if (!Number.isInteger(input.serviceYears) || input.serviceYears <= 0) {
     return {
@@ -127,24 +137,30 @@ export function checkEligibility(input: EligibilityInput): EligibilityResult {
 
   if (input.targetAward) {
     const generalUnmet = checkGeneralCriteria(input);
-    const specificUnmet = checkAwardSpecificCriteria(input);
+    const specificUnmet = checkAwardSpecificCriteria(input, now);
     const unmetCriteria = [...generalUnmet, ...specificUnmet];
 
-    return {
-      eligible: unmetCriteria.length === 0,
-      targetAward: input.targetAward,
-      unmetCriteria,
-    };
+    return withWarnings(
+      {
+        eligible: unmetCriteria.length === 0,
+        targetAward: input.targetAward,
+        unmetCriteria,
+      },
+      input,
+    );
   }
 
   // No target award specified — determine all eligible awards
-  const eligibleAwards = getEligibleAwards(input);
+  const eligibleAwards = getEligibleAwards(input, now);
 
-  return {
-    eligible: eligibleAwards.length > 0,
-    eligibleAwards,
-    unmetCriteria: [],
-  };
+  return withWarnings(
+    {
+      eligible: eligibleAwards.length > 0,
+      eligibleAwards,
+      unmetCriteria: [],
+    },
+    input,
+  );
 }
 
 /**
@@ -152,6 +168,7 @@ export function checkEligibility(input: EligibilityInput): EligibilityResult {
  */
 export function getEligibleAwards(
   input: Omit<EligibilityInput, "targetAward">,
+  now: Date = new Date(),
 ): AwardName[] {
   const eligible: AwardName[] = [];
 
@@ -162,7 +179,7 @@ export function getEligibleAwards(
     };
 
     const generalUnmet = checkGeneralCriteria(inputWithTarget);
-    const specificUnmet = checkAwardSpecificCriteria(inputWithTarget);
+    const specificUnmet = checkAwardSpecificCriteria(inputWithTarget, now);
 
     if (generalUnmet.length === 0 && specificUnmet.length === 0) {
       eligible.push(award.name);
@@ -170,4 +187,27 @@ export function getEligibleAwards(
   }
 
   return eligible;
+}
+
+/**
+ * Adds a warning when a previous award is held but its date was not supplied,
+ * because the five-year gap cannot be verified without it.
+ */
+function withWarnings(
+  result: EligibilityResult,
+  input: EligibilityInput,
+): EligibilityResult {
+  if (
+    input.previousAward &&
+    input.previousAward !== "none" &&
+    !input.dateOfLastAward
+  ) {
+    return {
+      ...result,
+      warnings: [
+        "dateOfLastAward was not provided, so the five-year gap since the last Good Service Award could not be checked. Check the date on the member's awards page.",
+      ],
+    };
+  }
+  return result;
 }

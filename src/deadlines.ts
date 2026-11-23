@@ -50,10 +50,10 @@ export function getNextDeadline(currentDate: Date): Deadline {
 }
 
 /**
- * Returns all four quarterly deadlines for the current year.
+ * Returns all four quarterly deadlines for the year of the reference date.
  */
-export function getAllDeadlines(): Deadline[] {
-  const year = new Date().getFullYear();
+export function getAllDeadlines(referenceDate: Date = new Date()): Deadline[] {
+  const year = referenceDate.getFullYear();
   return QUARTERLY_DEADLINES.map((q) => ({
     date: toISODate(year, q.month, q.day),
     quarter: q.quarter,

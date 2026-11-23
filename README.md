@@ -86,7 +86,8 @@ Check whether a nominee is eligible for a specific Good Service Award, or determ
 | `isMember` | boolean | Yes | Whether the nominee is a current member |
 | `isAppointed` | boolean | Yes | Whether the nominee holds a current appointment |
 | `mandatoryLearningComplete` | boolean | Yes | Whether mandatory learning is complete |
-| `criminalRecordCheckValid` | boolean | Yes | Whether CRC is valid |
+| `criminalRecordCheckValid` | boolean | Yes | Whether the nominee's disclosure check is valid |
+| `disclosureRequired` | boolean | No | Whether the nominee's active role requires a disclosure check (default `true`). When `false`, `criminalRecordCheckValid` is ignored |
 | `previousAward` | string | No | Most recent Good Service Award held, or "none" |
 | `dateOfLastAward` | string (ISO date) | No | Date the previous award was received |
 | `targetAward` | string | No | Specific award to check eligibility for |
@@ -96,6 +97,7 @@ Check whether a nominee is eligible for a specific Good Service Award, or determ
 **Behaviour:**
 - If `targetAward` is provided: returns whether the nominee is eligible for that specific award, with details of any unmet criteria
 - If `targetAward` is omitted: returns a list of all awards the nominee currently qualifies for
+- If a previous award is held but `dateOfLastAward` is missing, the result includes a `warning` that the five-year gap could not be checked
 
 ### build_nomination
 
@@ -212,8 +214,9 @@ Guide the user step-by-step through collecting nominee data for a Good Service A
 | `nomineeName` | string | Nominee's full name (2–100 characters) |
 | `currentRoles` | object | `{ hasNonProvisionalRole: boolean, totalRoles: number }` |
 | `historicRoles` | object | `{ earliestStartDate: string, totalServiceYears: number }` |
-| `currentAwards` | object | `{ highestAward: string }` — award name or "none" |
+| `currentAwards` | object | `{ highestAward: string, dateOfLastAward?: string }` — award name or "none", and the date it was received (ISO) so the five-year gap can be checked |
 | `criminalRecordCheck` | boolean | Whether nominee has a valid disclosure check |
+| `criminalRecordCheckRequired` | boolean | Set to `false` if the nominee's active role does not require a disclosure check (skips that step) |
 | `mandatoryLearning` | boolean | Whether nominee has completed mandatory learning |
 | `personalStory` | object | `{ motivation: string, characterTraits?: string, definingMoments?: string }` |
 | `lineManagers` | object | `{ confirmed: boolean, input?: LineManagerInput[] }` |
@@ -348,14 +351,18 @@ User: "I'd like to nominate someone for a Good Service Award"
 
 ## Award Hierarchy
 
-| Award | Min. Service | Classification | Approved By |
-|-------|-------------|----------------|-------------|
-| Chief Scout's Commendation for Good Service | 5 years | Lower | Local (District/County/Area) |
-| Award for Merit | 10 years | Lower | Local (District/County/Area) |
-| Bar to the Award for Merit | 15 years | Lower | Local (District/County/Area) |
-| Silver Acorn | 20 years | Lower | Local (District/County/Area) |
-| Bar to the Silver Acorn | 25 years | Higher | National Awards Advisory Group |
-| Silver Wolf | 30 years | Higher | National Awards Advisory Group |
+| Award | Service needed | Previous award needed | Approved by |
+|-------|----------------|-----------------------|-------------|
+| Chief Scout's Commendation for Good Service | 5 years | No | District Commissioner and above |
+| Award for Merit | 10 years | No | District Commissioner and above |
+| Bar to the Award for Merit | 5 years after receiving the Award for Merit | Award for Merit | County Commissioner and above |
+| Silver Acorn | 20 years | No | County Commissioner and above |
+| Bar to the Silver Acorn | 5 years after receiving the Silver Acorn | Silver Acorn | National Awards Advisory Group |
+| Silver Wolf | Rarely awarded for less than 30 years | No | National Awards Advisory Group |
+
+At least five years must have passed since the nominee's previous Good Service Award. A disclosure check is only required if the nominee's active role requires one.
+
+The rules are embedded in the package. `get_award_info` returns a `dataLastReviewed` date and the official `sources` they were checked against.
 
 ## Development
 
