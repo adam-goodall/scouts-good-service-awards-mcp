@@ -6,6 +6,9 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 10
+    commit-message:
+      prefix: "fix"
+      prefix-development: "fix"
     labels:
       - "dependencies"
       - "javascript"
