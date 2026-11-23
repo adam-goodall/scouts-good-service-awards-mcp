@@ -29,7 +29,7 @@ export const AWARD_HIERARCHY: Award[] = [
     approvalAuthority: "District Commissioner and above",
     fiveYearGapRequired: true,
     description:
-      "Recognises at least 10 years of outstanding service to Scouting.",
+      "Recognises at least 10 years of outstanding service to Scouting. Formerly called the Medal of Merit; holders of either name qualify for the Bar.",
   },
   {
     name: "Bar to the Award for Merit",
@@ -39,7 +39,7 @@ export const AWARD_HIERARCHY: Award[] = [
     approvalAuthority: "County Commissioner and above",
     fiveYearGapRequired: true,
     description:
-      "Recognises continued outstanding service, at least 5 years after receiving the Award for Merit.",
+      "Recognises continued outstanding service, at least 5 years after receiving the Award for Merit (or the Medal of Merit, its former name).",
   },
   {
     name: "Silver Acorn",
